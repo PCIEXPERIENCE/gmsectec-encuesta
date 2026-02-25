@@ -1,0 +1,1 @@
+# gmsectec-encuesta
