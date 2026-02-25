@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GMSectec · Evaluación Global de Servicio</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg: #05080f;
+  --surface: #0d1220;
+  --surface2: #131b2e;
+  --surface3: #1a2440;
+  --accent: #4f8ef7;
+  --accent2: #00d4aa;
+  --gold: #f0b429;
+  --text: #e8edf5;
+  --muted: #5a6a85;
+  --border: #1e2d45;
+  --green: #00c27a;
+  --yellow: #f0b429;
+  --red: #f04060;
+  --orange: #f07040;
+  --blue: #4f8ef7;
+  --purple: #9b6ef7;
+  --teal: #00d4aa;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+
+/* ===== NAV TABS ===== */
+.tab-nav{
+  position:sticky;top:0;z-index:50;
+  background:rgba(5,8,15,0.92);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:0;
+  padding:0 24px;
+}
+.tab-btn{
+  padding:16px 24px;
+  background:none;border:none;
+  color:var(--muted);font-size:13px;font-weight:500;
+  font-family:'Inter',sans-serif;cursor:pointer;
+  border-bottom:2px solid transparent;
+  transition:all 0.25s ease;
+  white-space:nowrap;
+}
+.tab-btn:hover{color:var(--text);}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
+.tab-logo{
+  display:flex;align-items:center;gap:10px;
+  margin-right:auto;padding:12px 0;
+  border-right:1px solid var(--border);
+  padding-right:24px;margin-right:24px;
+}
+.tab-logo img{height:36px;border-radius:6px;}
+.tab-logo span{font-family:'Syne',sans-serif;font-weight:700;font-size:15px;color:var(--text);}
+
+/* ===== SCREENS ===== */
+.screen{display:none;min-height:calc(100vh - 57px);}
+.screen.active{display:block;}
+
+/* ===== SURVEY SCREEN ===== */
+.survey-container{max-width:800px;margin:0 auto;padding:48px 24px 80px;}
+
+.survey-hero{text-align:center;margin-bottom:56px;}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(79,142,247,0.1);
+  border:1px solid rgba(79,142,247,0.25);
+  color:var(--accent2);font-size:11px;font-weight:600;
+  letter-spacing:2px;text-transform:uppercase;
+  padding:7px 18px;border-radius:100px;margin-bottom:24px;
+}
+.hero-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--accent2);}
+.survey-hero h1{
+  font-family:'Syne',sans-serif;
+  font-size:clamp(32px,5vw,50px);font-weight:800;
+  line-height:1.1;margin-bottom:16px;
+  background:linear-gradient(135deg,var(--text) 30%,var(--accent));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.survey-hero p{color:var(--muted);font-size:15px;max-width:520px;margin:0 auto;line-height:1.7;}
+
+/* CLIENT INFO */
+.client-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:20px;padding:32px;margin-bottom:32px;
+}
+.client-card h3{font-family:'Syne',sans-serif;font-size:16px;margin-bottom:20px;color:var(--accent);}
+.fields-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.field-group{display:flex;flex-direction:column;gap:6px;}
+.field-group.full{grid-column:1/-1;}
+.field-label{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
+.field-input,.field-select{
+  background:var(--surface2);border:1.5px solid var(--border);
+  border-radius:10px;padding:12px 14px;
+  color:var(--text);font-size:14px;font-family:'Inter',sans-serif;
+  outline:none;transition:border-color 0.2s;
+  width:100%;
+}
+.field-input:focus,.field-select:focus{border-color:var(--accent);}
+.field-input::placeholder{color:var(--muted);}
+.field-select option{background:var(--surface2);}
+
+/* SECTION BLOCK */
+.section-block{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:20px;padding:32px;margin-bottom:24px;
+  position:relative;overflow:hidden;
+}
+.section-block::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:var(--section-color,var(--accent));
+}
+.section-header{display:flex;align-items:center;gap:14px;margin-bottom:28px;}
+.section-icon{
+  width:44px;height:44px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;flex-shrink:0;
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--border);
+}
+.section-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;}
+.section-sub{font-size:13px;color:var(--muted);margin-top:2px;}
+
+/* QUESTION ROW */
+.question-row{margin-bottom:28px;}
+.question-row:last-child{margin-bottom:0;}
+.q-label{font-size:14px;font-weight:500;margin-bottom:14px;line-height:1.5;}
+.stars{display:flex;gap:8px;flex-wrap:wrap;}
+.star-btn{
+  width:44px;height:44px;border-radius:10px;
+  border:1.5px solid var(--border);background:var(--surface2);
+  color:var(--muted);font-size:16px;font-weight:700;
+  cursor:pointer;transition:all 0.2s;font-family:'Inter',sans-serif;
+  display:flex;align-items:center;justify-content:center;
+}
+.star-btn:hover{border-color:var(--accent);color:var(--text);transform:translateY(-2px);}
+.star-btn.active{
+  background:var(--section-color,var(--accent));
+  border-color:var(--section-color,var(--accent));
+  color:white;transform:translateY(-2px);
+  box-shadow:0 6px 20px rgba(79,142,247,0.35);
+}
+.star-labels{display:flex;justify-content:space-between;margin-top:8px;font-size:11px;color:var(--muted);}
+
+/* OPTIONS */
+.opts{display:flex;flex-direction:column;gap:8px;}
+.opt-btn{
+  background:var(--surface2);border:1.5px solid var(--border);
+  border-radius:10px;padding:12px 16px;
+  color:var(--text);font-size:13px;font-family:'Inter',sans-serif;
+  cursor:pointer;text-align:left;transition:all 0.2s;
+  display:flex;align-items:center;gap:10px;
+}
+.opt-btn:hover{border-color:var(--accent);}
+.opt-btn.active{border-color:var(--accent);background:rgba(79,142,247,0.1);}
+.opt-dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--muted);flex-shrink:0;transition:all 0.2s;}
+.opt-btn.active .opt-dot{background:var(--accent);border-color:var(--accent);}
+
+/* TEXTAREA */
+.area-input{
+  width:100%;background:var(--surface2);border:1.5px solid var(--border);
+  border-radius:10px;padding:14px;color:var(--text);
+  font-size:13px;font-family:'Inter',sans-serif;
+  resize:vertical;min-height:90px;outline:none;
+  transition:border-color 0.2s;
+}
+.area-input:focus{border-color:var(--accent);}
+.area-input::placeholder{color:var(--muted);}
+
+/* SUBMIT */
+.submit-wrap{text-align:center;margin-top:40px;}
+.btn-submit{
+  padding:16px 48px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border:none;border-radius:14px;color:white;
+  font-size:15px;font-weight:600;font-family:'Inter',sans-serif;
+  cursor:pointer;transition:all 0.3s;
+  box-shadow:0 8px 32px rgba(79,142,247,0.35);
+}
+.btn-submit:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(79,142,247,0.5);}
+.btn-submit:disabled{opacity:0.4;cursor:not-allowed;transform:none;}
+
+/* WEBHOOK BAR */
+.webhook-bar{
+  background:rgba(240,180,41,0.08);border:1px solid rgba(240,180,41,0.2);
+  border-radius:14px;padding:16px 20px;margin-bottom:28px;
+  font-size:13px;display:flex;gap:12px;align-items:flex-start;
+}
+.webhook-bar .wi{font-size:18px;flex-shrink:0;}
+.wh-row{display:flex;gap:8px;margin-top:8px;}
+.wh-inp{
+  flex:1;background:var(--surface2);border:1px solid rgba(240,180,41,0.3);
+  border-radius:8px;padding:8px 12px;color:var(--text);
+  font-size:12px;font-family:'Inter',sans-serif;outline:none;
+}
+.wh-inp:focus{border-color:var(--accent);}
+.wh-inp::placeholder{color:var(--muted);}
+.btn-wh{
+  padding:8px 14px;background:var(--accent);border:none;
+  border-radius:8px;color:white;font-size:12px;font-weight:600;
+  font-family:'Inter',sans-serif;cursor:pointer;white-space:nowrap;
+}
+
+/* SUCCESS */
+.success-screen{
+  text-align:center;padding:80px 24px;
+  display:none;
+}
+.success-screen.show{display:block;}
+.success-icon{font-size:64px;margin-bottom:24px;}
+.success-screen h2{font-family:'Syne',sans-serif;font-size:32px;font-weight:800;margin-bottom:12px;}
+.success-screen p{color:var(--muted);font-size:15px;margin-bottom:32px;}
+.btn-dash{
+  padding:14px 32px;background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border:none;border-radius:12px;color:white;font-size:14px;font-weight:600;
+  font-family:'Inter',sans-serif;cursor:pointer;
+}
+
+/* ===== DASHBOARD ===== */
+.dash-container{padding:32px 28px 80px;max-width:1400px;margin:0 auto;}
+.dash-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:36px;flex-wrap:gap;}
+.dash-header h2{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;}
+.dash-header p{color:var(--muted);font-size:14px;margin-top:4px;}
+.dash-actions{display:flex;gap:10px;}
+.btn-dash-action{
+  padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;
+  font-family:'Inter',sans-serif;cursor:pointer;transition:all 0.2s;
+}
+.btn-primary-d{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;color:white;}
+.btn-secondary-d{background:transparent;border:1.5px solid var(--border);color:var(--text);}
+.btn-secondary-d:hover{border-color:var(--muted);}
+
+/* KPI ROW */
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:28px;}
+.kpi-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:16px;
+  padding:22px;position:relative;overflow:hidden;
+}
+.kpi-card::after{
+  content:'';position:absolute;top:-40px;right:-40px;
+  width:100px;height:100px;border-radius:50%;
+  background:var(--kc,rgba(79,142,247,0.08));
+}
+.kpi-label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
+.kpi-val{font-family:'Syne',sans-serif;font-size:34px;font-weight:800;line-height:1;margin-bottom:6px;}
+.kpi-sub{font-size:12px;color:var(--muted);}
+.kpi-badge{display:inline-block;padding:3px 10px;border-radius:100px;font-size:11px;font-weight:600;margin-top:8px;}
+.badge-green{background:rgba(0,194,122,0.15);color:var(--green);}
+.badge-yellow{background:rgba(240,180,41,0.15);color:var(--yellow);}
+.badge-red{background:rgba(240,64,96,0.15);color:var(--red);}
+
+/* CHART GRID */
+.chart-row{display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:20px;}
+.chart-row-3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:20px;}
+.chart-row-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;}
+.chart-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:18px;padding:24px;
+}
+.chart-card h4{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:4px;}
+.chart-card p{font-size:12px;color:var(--muted);margin-bottom:20px;}
+.chart-wrap{position:relative;}
+
+/* AREA CARDS */
+.areas-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:20px;}
+.area-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:16px;padding:22px;position:relative;overflow:hidden;
+}
+.area-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:var(--ac,var(--accent));
+}
+.area-head{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+.area-emoji{font-size:22px;}
+.area-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;}
+.area-metrics{display:flex;flex-direction:column;gap:10px;}
+.area-metric{display:flex;flex-direction:column;gap:4px;}
+.area-metric-top{display:flex;justify-content:space-between;font-size:12px;}
+.area-metric-label{color:var(--muted);}
+.area-metric-val{font-weight:600;}
+.mini-bar{background:var(--surface2);height:5px;border-radius:3px;overflow:hidden;}
+.mini-bar-fill{height:100%;border-radius:3px;background:var(--ac,var(--accent));transition:width 1s ease;}
+
+/* TABLE */
+.table-card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px;margin-bottom:20px;overflow:hidden;}
+.table-card h4{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:4px;}
+.table-card p{font-size:12px;color:var(--muted);margin-bottom:20px;}
+.resp-table{width:100%;border-collapse:collapse;font-size:13px;}
+.resp-table th{
+  text-align:left;padding:10px 14px;
+  color:var(--muted);font-size:11px;font-weight:600;
+  text-transform:uppercase;letter-spacing:1px;
+  border-bottom:1px solid var(--border);
+}
+.resp-table td{padding:12px 14px;border-bottom:1px solid rgba(30,45,69,0.5);}
+.resp-table tr:last-child td{border-bottom:none;}
+.pill{
+  display:inline-block;padding:3px 10px;border-radius:100px;
+  font-size:11px;font-weight:600;
+}
+.pill-g{background:rgba(0,194,122,0.15);color:var(--green);}
+.pill-y{background:rgba(240,180,41,0.15);color:var(--yellow);}
+.pill-r{background:rgba(240,64,96,0.15);color:var(--red);}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:60px 24px;}
+.empty-icon{font-size:48px;margin-bottom:16px;opacity:0.4;}
+.empty-state h3{font-family:'Syne',sans-serif;font-size:20px;margin-bottom:8px;color:var(--muted);}
+.empty-state p{font-size:14px;color:var(--muted);max-width:380px;margin:0 auto;}
+
+/* TOAST */
+.toast{
+  position:fixed;bottom:24px;right:24px;z-index:200;
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:14px 20px;font-size:13px;display:flex;align-items:center;gap:10px;
+  opacity:0;transform:translateY(12px);transition:all 0.3s;max-width:300px;
+}
+.toast.show{opacity:1;transform:translateY(0);}
+.t-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;}
+
+@media(max-width:768px){
+  .chart-row,.chart-row-3,.chart-row-2{grid-template-columns:1fr;}
+  .fields-grid{grid-template-columns:1fr;}
+  .kpi-row{grid-template-columns:repeat(2,1fr);}
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+.fadeUp{animation:fadeUp 0.5s ease both;}
+</style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><div class="t-dot"></div><span id="toast-msg">Guardado</span></div>
+
+<!-- NAV -->
+<nav class="tab-nav">
+  <div class="tab-logo">
+    <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD//gA7Q1JFQVRPUjogZ2QtanBlZyB2MS4wICh1c2luZyBJSkcgSlBFRyB2NjIpLCBxdWFsaXR5ID0gODIK/9sAQwAGBAQFBAQGBQUFBgYGBwkOCQkICAkSDQ0KDhUSFhYVEhQUFxohHBcYHxkUFB0nHR8iIyUlJRYcKSwoJCshJCUk/9sAQwEGBgYJCAkRCQkRJBgUGCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQk/8AAEQgCowSwAwEiAAIRAQMRAf/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC//EALUQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29/j5+v/EAB8BAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKC//EALURAAIBAgQEAwQHBQQEAAECdwABAgMRBAUhMQYSQVEHYXETIjKBCBRCkaGxwQkjM1LwFWJy0QoWJDThJfEXGBkaJicoKSo1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoKDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uLj5OXm5+jp6vLz9PX29/j5+v/aAAwDAQACEQMRAD8A+OaKKK9s84KKKKACiiigAooooAKKKKAP/9k=" alt="GM" onerror="this.style.display='none'">
+    <span>GMSectec</span>
+  </div>
+  <button class="tab-btn active" onclick="showScreen('survey')">📋 Encuesta</button>
+  <button class="tab-btn" onclick="showScreen('dashboard')" id="tab-dash">📊 Dashboard</button>
+</nav>
+
+<!-- ============ SURVEY SCREEN ============ -->
+<div class="screen active" id="screen-survey">
+  <div class="survey-container">
+
+    <div class="survey-hero fadeUp">
+      <div class="hero-badge">Evaluación Global · GMSectec</div>
+      <h1>¿Cómo fue tu experiencia con nuestros servicios?</h1>
+      <p>Tu opinión nos permite mejorar y construir relaciones duraderas. La encuesta toma menos de 5 minutos.</p>
+    </div>
+
+    <!-- WEBHOOK BAR -->
+    <div class="webhook-bar fadeUp" id="wh-bar">
+      <span class="wi">⚙️</span>
+      <div style="flex:1">
+        <strong>Conectar Google Sheets</strong> — pega tu Web App URL para guardar respuestas automáticamente.
+        <div class="wh-row">
+          <input class="wh-inp" id="wh-url" type="url" placeholder="https://script.google.com/macros/s/.../exec">
+          <button class="btn-wh" onclick="saveWH()">Guardar</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="survey-form">
+
+      <!-- INFO CLIENTE -->
+      <div class="client-card fadeUp">
+        <h3>📌 Información del Cliente</h3>
+        <div class="fields-grid">
+          <div class="field-group">
+            <label class="field-label">Empresa / Cliente</label>
+            <input class="field-input" id="fi-empresa" placeholder="Nombre de la empresa">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Nombre del evaluador</label>
+            <input class="field-input" id="fi-evaluador" placeholder="Tu nombre completo">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Cargo</label>
+            <input class="field-input" id="fi-cargo" placeholder="Director, Gerente, Analista...">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Período evaluado</label>
+            <input class="field-input" id="fi-periodo" type="month">
+          </div>
+          <div class="field-group full">
+            <label class="field-label">Proyecto / Servicio contratado</label>
+            <input class="field-input" id="fi-proyecto" placeholder="Ej: Total Compliance, Ciberseguridad, SOC...">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Tiempo como cliente</label>
+            <select class="field-select" id="fi-tiempo">
+              <option value="">Selecciona...</option>
+              <option>Menos de 6 meses</option>
+              <option>6 meses – 1 año</option>
+              <option>1 – 2 años</option>
+              <option>Más de 2 años</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Tipo de contrato</label>
+            <select class="field-select" id="fi-contrato">
+              <option value="">Selecciona...</option>
+              <option>Proyecto único</option>
+              <option>Servicio recurrente</option>
+              <option>Contrato anual</option>
+              <option>SLA / Soporte</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- S1: SATISFACCIÓN GLOBAL -->
+      <div class="section-block fadeUp" style="--section-color:var(--blue)">
+        <div class="section-header">
+          <div class="section-icon">🌐</div>
+          <div>
+            <div class="section-title">Satisfacción Global del Servicio</div>
+            <div class="section-sub">Percepción general de la relación con GMSectec</div>
+          </div>
+        </div>
+
+        <div class="question-row">
+          <div class="q-label">1. ¿Qué tan satisfecho estás con el servicio de GMSectec en general? <span style="color:var(--red)">*</span></div>
+          <div class="stars" id="s1q1" data-max="5"></div>
+          <div class="star-labels"><span>Muy insatisfecho</span><span>Muy satisfecho</span></div>
+        </div>
+        <div class="question-row">
+          <div class="q-label">2. ¿Los servicios contratados cumplieron con los objetivos y resultados esperados?</div>
+          <div class="stars" id="s1q2" data-max="5"></div>
+          <div class="star-labels"><span>No cumplió</span><span>Superó expectativas</span></div>
+        </div>
+        <div class="question-row">
+          <div class="q-label">3. ¿La relación calidad-precio del servicio fue adecuada?</div>
+          <div class="stars" id="s1q3" data-max="5"></div>
+          <div class="star-labels"><span>Nada adecuada</span><span>Excelente valor</span></div>
+        </div>
+        <div class="question-row">
+          <div class="q-label">4. NPS — ¿Qué tan probable es que recomiendes GMSectec a otra organización? (0–10)</div>
+          <div class="stars" id="s1q4" data-max="11"></div>
+          <div class="star-labels"><span>Nada probable (0)</span><span>Totalmente seguro (10)</span></div>
+        </div>
+        <div class="question-row">
+          <div class="q-label">5. ¿Cuál es la probabilidad de renovar o ampliar servicios con GMSectec?</div>
+          <div class="stars" id="s1q5" data-max="5"></div>
+          <div class="star-labels"><span>Muy baja</span><span>Muy alta</span></div>
+        </div>
+      </div>
+
+      <!-- S2: OPERACIONES -->
+      <div class="section-block fadeUp" style="--section-color:var(--teal)">
+        <div class="section-header">
+          <div class="section-icon">⚙️</div>
+          <div>
+            <div class="section-title">Área de Operaciones</div>
+            <div class="section-sub">Recursos técnicos y ejecución del servicio</div>
+          </div>
+        </div>
+        <div class="question-row">
+          <div class="q-label">6. ¿El equipo de operaciones demostró conocimiento técnico suficiente?</div>
+          <div class="stars" id="s2q1" data-max="5"></div>
+          <div class="star-labels"><span>Insuficiente</span><span>Excelente</span></div>
+        </div>
+        <div class="question-row">
+          <div class="q-label">7. ¿Los tiempos de respuesta ante incidentes o solicitudes fueron adecuados?</div>
+          <div class="stars" id="s2q2" data-max="5"></div>
+          <div class="star-labels"><span>Muy lentos</span><span>Muy ágiles</span></div>
+        </div>
+        <div class="question-row">
+          <div class="q-label">8. ¿Los entregables técnicos cumplieron con la calidad requerida?</div>
+          <div class="stars" id="s2q3" data-max="5"></div>
+          <div class="star-labels"><span>Baja calidad</span><span>Alta calidad</span></div>
+        </div>
+        <div class="question-row">
+          <div class="q-label">9. ¿La comunicación del equipo técnico fue clara y oportuna?</div>
+          <div class="stars" id="s2q4" data-max="5"></div>
+          <div class="star-labels"><span>Deficiente</span><span>Excelente</span></div>
+        </div>
+        <div class="question-row">
+          <div class="q-label">Comentarios sobre Operaciones (opcional)</div>
+          <textarea class="area-input" id="s2-comment" placeholder="¿Algo específico que destacar o mejorar?"></textarea>
+        </div>
+      </div>
+
+      <!-- S3: ADMINISTRATIVA -->
+      <div class="section-block fadeUp" style="--section-color:var(--purple)">
+        <div class="section-header">
+          <div class="section-icon">🏛️</div>
+          <div>
+            <div class="section-title">Área Administrativa</div>
+            <div class="section-sub">Facturación, contratos y gestión documental</div>
+          </div>
+        </div>
+        <div class="question-row">
+          <div class="q-label">10. ¿Los procesos de facturación fueron correctos y oportunos?</div>
+          <div class="stars" id="s3q1" data-max="5"></div>
+          <div class="star-labels"><span>Con muchos errores</span><span>Sin ningún problema</span></div>
+        </div>
+        <div class="question-row">
+          <div class="q-label">11. ¿La gestión contractual y documental fue eficiente?</div>
+          <div class="stars" id="s3q2" data-max="5"></div>
+          <div class="star-labels"><span>Deficiente</span><span>Muy eficiente</span></div>
+        </div>
+        <div class="question-row">
+          <div class="q-label">12. ¿Las respuestas del área administrativa fueron rápidas y resolutivas?</div>
+          <div class="stars" id="s3q3" data-max="5"></div>
+          <div class="star-labels"><span>Muy lentas</span><span>Muy rápidas</span></div>
+        </div>
+        <div class="question-row">
+          <div class="q-label">Comentarios sobre el Área Administrativa (opcional)</div>
+          <textarea class="area-input" id="s3-comment" placeholder="¿Algo específico que destacar o mejorar?"></textarea>
+        </div>
+      </div>
+
+      <!-- S4: COMERCIAL -->
+      <div class="section-block fadeUp" style="--section-color:var(--gold)">
+        <div class="section-header">
+          <div class="section-icon">💼</div>
+          <div>
+            <div class="section-title">Área Comercial</div>
+            <div class="section-sub">Propuestas, negociación y gestión de la cuenta</div>
+          </div>
+        </div>
+        <div class="question-row">
+          <div class="q-label">13. ¿Las propuestas comerciales se adaptaron a tus necesidades reales?</div>
+          <div class="stars" id="s4q1" data-max="5"></div>
+          <div class="star-labels"><span>Para nada</span><span>Totalmente</span></div>
+        </div>
+        <div class="question-row">
+          <div class="q-label">14. ¿El ejecutivo comercial mantuvo una relación cercana y proactiva?</div>
+          <div class="stars" id="s4q2" data-max="5"></div>
+          <div class="star-labels"><span>Ausente</span><span>Muy presente</span></div>
+        </div>
+        <div class="question-row">
+          <div class="q-label">15. ¿La transparencia durante el proceso de negociación y cierre fue adecuada?</div>
+          <div class="stars" id="s4q3" data-max="5"></div>
+          <div class="star-labels"><span>Poca transparencia</span><span>Total transparencia</span></div>
+        </div>
+        <div class="question-row">
+          <div class="q-label">Comentarios sobre el Área Comercial (opcional)</div>
+          <textarea class="area-input" id="s4-comment" placeholder="¿Algo específico que destacar o mejorar?"></textarea>
+        </div>
+      </div>
+
+      <!-- S5: PMO -->
+      <div class="section-block fadeUp" style="--section-color:var(--green)">
+        <div class="section-header">
+          <div class="section-icon">🗂️</div>
+          <div>
+            <div class="section-title">Área PMO</div>
+            <div class="section-sub">Gestión de proyectos, seguimiento y reportes</div>
+          </div>
+        </div>
+        <div class="question-row">
+          <div class="q-label">16. ¿El seguimiento y monitoreo del proyecto fue constante y organizado?</div>
+          <div class="stars" id="s5q1" data-max="5"></div>
+          <div class="star-labels"><span>Desorganizado</span><span>Muy organizado</span></div>
+        </div>
+        <div class="question-row">
+          <div class="q-label">17. ¿Los reportes de avance fueron claros, útiles y entregados a tiempo?</div>
+          <div class="stars" id="s5q2" data-max="5"></div>
+          <div class="star-labels"><span>Poco útiles</span><span>Muy útiles</span></div>
+        </div>
+        <div class="question-row">
+          <div class="q-label">18. ¿Los riesgos e imprevistos fueron gestionados proactivamente?</div>
+          <div class="stars" id="s5q3" data-max="5"></div>
+          <div class="star-labels"><span>Reactivo</span><span>Muy proactivo</span></div>
+        </div>
+        <div class="question-row">
+          <div class="q-label">19. ¿El PMO actuó como un puente efectivo entre tu organización y GMSectec?</div>
+          <div class="stars" id="s5q4" data-max="5"></div>
+          <div class="star-labels"><span>Poco efectivo</span><span>Muy efectivo</span></div>
+        </div>
+        <div class="question-row">
+          <div class="q-label">Comentarios sobre el Área PMO (opcional)</div>
+          <textarea class="area-input" id="s5-comment" placeholder="¿Algo específico que destacar o mejorar?"></textarea>
+        </div>
+      </div>
+
+      <!-- S6: CIERRE -->
+      <div class="section-block fadeUp" style="--section-color:var(--orange)">
+        <div class="section-header">
+          <div class="section-icon">💬</div>
+          <div>
+            <div class="section-title">Cierre y Comentarios Generales</div>
+            <div class="section-sub">Tu opinión final es la más valiosa</div>
+          </div>
+        </div>
+        <div class="question-row">
+          <div class="q-label">20. ¿Cuál es la principal razón si NO renovarías el servicio?</div>
+          <div class="opts" id="norenew-opts">
+            <button class="opt-btn" data-val="presupuesto"><span class="opt-dot"></span>Restricción de presupuesto</button>
+            <button class="opt-btn" data-val="valor"><span class="opt-dot"></span>No percibí suficiente valor o ROI</button>
+            <button class="opt-btn" data-val="funcionalidad"><span class="opt-dot"></span>Faltaban funcionalidades necesarias</button>
+            <button class="opt-btn" data-val="soporte"><span class="opt-dot"></span>Problemas con el soporte o la relación</button>
+            <button class="opt-btn" data-val="alternativa"><span class="opt-dot"></span>Encontré una alternativa más conveniente</button>
+            <button class="opt-btn" data-val="prioridades"><span class="opt-dot"></span>Cambio de prioridades internas</button>
+            <button class="opt-btn" data-val="renovaria"><span class="opt-dot"></span>Sí renovaría el servicio</button>
+          </div>
+        </div>
+        <div class="question-row">
+          <div class="q-label">¿Qué es lo que más valoras de GMSectec?</div>
+          <textarea class="area-input" id="fortaleza" placeholder="Tu respuesta..."></textarea>
+        </div>
+        <div class="question-row">
+          <div class="q-label">¿Qué deberíamos mejorar prioritariamente?</div>
+          <textarea class="area-input" id="mejora" placeholder="Tu respuesta..."></textarea>
+        </div>
+      </div>
+
+      <div class="submit-wrap fadeUp">
+        <button class="btn-submit" id="btn-enviar" onclick="submitSurvey()">
+          Enviar Evaluación →
+        </button>
+      </div>
+    </div><!-- /survey-form -->
+
+    <!-- SUCCESS -->
+    <div class="success-screen" id="success-screen">
+      <div class="success-icon">🎉</div>
+      <h2>¡Gracias por tu evaluación!</h2>
+      <p>Tu feedback ha sido registrado exitosamente.<br>Esto nos ayuda a mejorar cada día.</p>
+      <button class="btn-dash" onclick="showScreen('dashboard')">Ver Dashboard de Resultados →</button>
+    </div>
+
+  </div>
+</div><!-- /survey screen -->
+
+<!-- ============ DASHBOARD SCREEN ============ -->
+<div class="screen" id="screen-dashboard">
+  <div class="dash-container">
+
+    <div class="dash-header fadeUp">
+      <div>
+        <h2>Dashboard de Satisfacción</h2>
+        <p id="dash-subtitle">Cargando datos...</p>
+      </div>
+      <div class="dash-actions">
+        <button class="btn-dash-action btn-secondary-d" onclick="exportCSV()">⬇️ Exportar CSV</button>
+        <button class="btn-dash-action btn-primary-d" onclick="exportSummary()">📋 Copiar resumen</button>
+      </div>
+    </div>
+
+    <!-- EMPTY STATE -->
+    <div class="empty-state" id="empty-state">
+      <div class="empty-icon">📊</div>
+      <h3>Aún no hay respuestas</h3>
+      <p>Completa la primera evaluación para comenzar a ver métricas, gráficos y tendencias aquí.</p>
+    </div>
+
+    <!-- DASHBOARD CONTENT (hidden until data) -->
+    <div id="dash-content" style="display:none">
+
+      <!-- KPIs -->
+      <div class="kpi-row" id="kpi-row"></div>
+
+      <!-- CHARTS ROW 1 -->
+      <div class="chart-row">
+        <div class="chart-card">
+          <h4>Satisfacción por Área</h4>
+          <p>Promedio de puntaje (0–100%) por cada área evaluada</p>
+          <div class="chart-wrap" style="height:260px">
+            <canvas id="chart-areas"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <h4>Probabilidad de Renovación</h4>
+          <p>Distribución de respuestas</p>
+          <div class="chart-wrap" style="height:260px">
+            <canvas id="chart-renewal"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHARTS ROW 2 -->
+      <div class="chart-row-2">
+        <div class="chart-card">
+          <h4>NPS — Net Promoter Score</h4>
+          <p>Distribución de promotores, neutros y detractores</p>
+          <div class="chart-wrap" style="height:220px">
+            <canvas id="chart-nps"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <h4>Razones de No Renovación</h4>
+          <p>Principal factor mencionado por los clientes</p>
+          <div class="chart-wrap" style="height:220px">
+            <canvas id="chart-reasons"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHARTS ROW 3 -->
+      <div class="chart-row-3">
+        <div class="chart-card">
+          <h4>Operaciones — Detalle</h4>
+          <p>Métricas por sub-dimensión</p>
+          <div class="chart-wrap" style="height:200px">
+            <canvas id="chart-ops"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <h4>PMO — Detalle</h4>
+          <p>Métricas por sub-dimensión</p>
+          <div class="chart-wrap" style="height:200px">
+            <canvas id="chart-pmo"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <h4>Calidad vs Precio</h4>
+          <p>Percepción de valor del servicio</p>
+          <div class="chart-wrap" style="height:200px">
+            <canvas id="chart-valor"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- AREA CARDS -->
+      <div class="areas-grid" id="areas-grid"></div>
+
+      <!-- RESPONSES TABLE -->
+      <div class="table-card">
+        <h4>Respuestas Individuales</h4>
+        <p>Todas las evaluaciones recibidas con sus métricas clave</p>
+        <div style="overflow-x:auto">
+          <table class="resp-table" id="resp-table">
+            <thead>
+              <tr>
+                <th>Empresa</th>
+                <th>Evaluador</th>
+                <th>Proyecto</th>
+                <th>Global</th>
+                <th>Operaciones</th>
+                <th>Administrativo</th>
+                <th>Comercial</th>
+                <th>PMO</th>
+                <th>NPS</th>
+                <th>Renovación</th>
+                <th>Fecha</th>
+              </tr>
+            </thead>
+            <tbody id="resp-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div><!-- /dash-content -->
+  </div>
+</div><!-- /dashboard screen -->
+
+<script>
+// ============================
+// DATA STORE
+// ============================
+let responses = JSON.parse(localStorage.getItem('gm_global_responses') || '[]');
+let WEBHOOK_URL = localStorage.getItem('gm_global_webhook') || '';
+
+if (WEBHOOK_URL) {
+  document.getElementById('wh-url').value = WEBHOOK_URL;
+  document.getElementById('wh-bar').style.display = 'none';
+}
+
+// ============================
+// TABS
+// ============================
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  event && event.target.classList.add('active');
+  if (name === 'dashboard') {
+    document.getElementById('tab-dash').classList.add('active');
+    renderDashboard();
+  }
+}
+
+// ============================
+// BUILD STAR BUTTONS
+// ============================
+document.querySelectorAll('.stars').forEach(wrap => {
+  const max = parseInt(wrap.dataset.max) || 5;
+  const isNPS = max === 11;
+  for (let i = 0; i < max; i++) {
+    const val = isNPS ? i : (i + 1);
+    const btn = document.createElement('button');
+    btn.className = 'star-btn';
+    btn.textContent = val;
+    btn.dataset.val = val;
+    btn.onclick = () => selectStar(wrap.id, val);
+    wrap.appendChild(btn);
+  }
+});
+
+function selectStar(groupId, val) {
+  const wrap = document.getElementById(groupId);
+  wrap.querySelectorAll('.star-btn').forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.val) === val);
+  });
+  wrap.dataset.selected = val;
+}
+
+// ============================
+// OPTIONS
+// ============================
+document.querySelectorAll('#norenew-opts .opt-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#norenew-opts .opt-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
+// ============================
+// WEBHOOK
+// ============================
+function saveWH() {
+  const url = document.getElementById('wh-url').value.trim();
+  if (!url) return;
+  WEBHOOK_URL = url;
+  localStorage.setItem('gm_global_webhook', url);
+  document.getElementById('wh-bar').style.display = 'none';
+  toast('✅ URL de Google Sheets guardada');
+}
+
+async function sendToSheets(data) {
+  if (!WEBHOOK_URL) return;
+  try {
+    await fetch(WEBHOOK_URL, {
+      method: 'POST', mode: 'no-cors',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(data)
+    });
+  } catch(e) {}
+}
+
+// ============================
+// SUBMIT
+// ============================
+function getStarVal(id) {
+  const el = document.getElementById(id);
+  return el ? (parseFloat(el.dataset.selected) || 0) : 0;
+}
+function norm5(v) { return v ? Math.round((v/5)*100) : 0; }
+
+async function submitSurvey() {
+  // Validate required
+  if (!document.getElementById('fi-empresa').value.trim()) {
+    toast('⚠️ Ingresa el nombre de la empresa', 'warn'); return;
+  }
+  if (!document.getElementById('s1q1').dataset.selected) {
+    toast('⚠️ Califica la satisfacción general', 'warn'); return;
+  }
+
+  const npsRaw = getStarVal('s1q4');
+
+  // Scores per area (0-100)
+  const global_sat   = norm5(getStarVal('s1q1'));
+  const global_obj   = norm5(getStarVal('s1q2'));
+  const global_valor = norm5(getStarVal('s1q3'));
+  const global_renew = norm5(getStarVal('s1q5'));
+
+  const ops_tec  = norm5(getStarVal('s2q1'));
+  const ops_resp = norm5(getStarVal('s2q2'));
+  const ops_cal  = norm5(getStarVal('s2q3'));
+  const ops_com  = norm5(getStarVal('s2q4'));
+  const ops_avg  = avg([ops_tec, ops_resp, ops_cal, ops_com].filter(v=>v>0));
+
+  const adm_fac  = norm5(getStarVal('s3q1'));
+  const adm_doc  = norm5(getStarVal('s3q2'));
+  const adm_resp = norm5(getStarVal('s3q3'));
+  const adm_avg  = avg([adm_fac, adm_doc, adm_resp].filter(v=>v>0));
+
+  const com_prop = norm5(getStarVal('s4q1'));
+  const com_rel  = norm5(getStarVal('s4q2'));
+  const com_trans= norm5(getStarVal('s4q3'));
+  const com_avg  = avg([com_prop, com_rel, com_trans].filter(v=>v>0));
+
+  const pmo_seg  = norm5(getStarVal('s5q1'));
+  const pmo_rep  = norm5(getStarVal('s5q2'));
+  const pmo_risk = norm5(getStarVal('s5q3'));
+  const pmo_pu   = norm5(getStarVal('s5q4'));
+  const pmo_avg  = avg([pmo_seg, pmo_rep, pmo_risk, pmo_pu].filter(v=>v>0));
+
+  const nps_score = Math.round((npsRaw/10)*100);
+  const renewProb = Math.round(
+    global_sat*0.20 + global_obj*0.20 + global_valor*0.15 +
+    ops_avg*0.15 + com_avg*0.10 + pmo_avg*0.10 + nps_score*0.10
+  );
+
+  const noRenewReason = document.querySelector('#norenew-opts .opt-btn.active')?.dataset.val || '';
+
+  const record = {
+    id: Date.now(),
+    fecha: new Date().toLocaleString('es-CO'),
+    empresa: document.getElementById('fi-empresa').value.trim(),
+    evaluador: document.getElementById('fi-evaluador').value.trim(),
+    cargo: document.getElementById('fi-cargo').value.trim(),
+    periodo: document.getElementById('fi-periodo').value,
+    proyecto: document.getElementById('fi-proyecto').value.trim(),
+    tiempo: document.getElementById('fi-tiempo').value,
+    contrato: document.getElementById('fi-contrato').value,
+    // Global
+    global_sat, global_obj, global_valor, global_renew,
+    nps: npsRaw, nps_score,
+    renew_prob: renewProb,
+    // Areas
+    ops_tec, ops_resp, ops_cal, ops_com, ops_avg,
+    adm_fac, adm_doc, adm_resp, adm_avg,
+    com_prop, com_rel, com_trans, com_avg,
+    pmo_seg, pmo_rep, pmo_risk, pmo_pu, pmo_avg,
+    // Comments
+    ops_comment: document.getElementById('s2-comment').value.trim(),
+    adm_comment: document.getElementById('s3-comment').value.trim(),
+    com_comment: document.getElementById('s4-comment').value.trim(),
+    pmo_comment: document.getElementById('s5-comment').value.trim(),
+    fortaleza: document.getElementById('fortaleza').value.trim(),
+    mejora: document.getElementById('mejora').value.trim(),
+    no_renew_reason: noRenewReason
+  };
+
+  responses.push(record);
+  localStorage.setItem('gm_global_responses', JSON.stringify(responses));
+  await sendToSheets(record);
+
+  document.getElementById('survey-form').style.display = 'none';
+  document.getElementById('success-screen').classList.add('show');
+  toast('✅ Evaluación enviada correctamente');
+}
+
+function avg(arr) {
+  if (!arr.length) return 0;
+  return Math.round(arr.reduce((a,b)=>a+b,0)/arr.length);
+}
+
+// ============================
+// DASHBOARD
+// ============================
+let chartsBuilt = false;
+let chartInstances = {};
+
+function renderDashboard() {
+  const n = responses.length;
+  document.getElementById('dash-subtitle').textContent =
+    n === 0 ? 'Sin evaluaciones aún' : `${n} evaluación${n>1?'es':''} registrada${n>1?'s':''}`;
+
+  document.getElementById('empty-state').style.display = n === 0 ? 'block' : 'none';
+  document.getElementById('dash-content').style.display = n === 0 ? 'none' : 'block';
+  if (n === 0) return;
+
+  // Helpers
+  const mean = key => avg(responses.map(r => r[key] || 0).filter(v=>v>0));
+  const pct = v => v + '%';
+
+  // KPIs
+  const kpis = [
+    {label:'Evaluaciones', val:n, sub:'Total recibidas', color:'var(--blue)', fmt: v=>v, badge:null},
+    {label:'Satisfacción Global', val:mean('global_sat'), sub:'Promedio general', color:'var(--teal)', fmt:pct, badge:scoreBadge(mean('global_sat'))},
+    {label:'NPS Score', val: calcNPS(), sub:'Net Promoter Score', color:'var(--purple)', fmt: v=> (v>0?'+':'')+v, badge:null},
+    {label:'Prob. Renovación', val:mean('renew_prob'), sub:'Promedio', color:'var(--green)', fmt:pct, badge:scoreBadge(mean('renew_prob'))},
+    {label:'Operaciones', val:mean('ops_avg'), sub:'Promedio área', color:'var(--teal)', fmt:pct, badge:scoreBadge(mean('ops_avg'))},
+    {label:'Administrativo', val:mean('adm_avg'), sub:'Promedio área', color:'var(--purple)', fmt:pct, badge:scoreBadge(mean('adm_avg'))},
+    {label:'Comercial', val:mean('com_avg'), sub:'Promedio área', color:'var(--gold)', fmt:pct, badge:scoreBadge(mean('com_avg'))},
+    {label:'PMO', val:mean('pmo_avg'), sub:'Promedio área', color:'var(--green)', fmt:pct, badge:scoreBadge(mean('pmo_avg'))},
+  ];
+  const kpiRow = document.getElementById('kpi-row');
+  kpiRow.innerHTML = '';
+  kpis.forEach(k => {
+    kpiRow.innerHTML += `<div class="kpi-card" style="--kc:${k.color}20">
+      <div class="kpi-label">${k.label}</div>
+      <div class="kpi-val" style="color:${k.color}">${k.fmt(k.val)}</div>
+      <div class="kpi-sub">${k.sub}</div>
+      ${k.badge ? `<div class="kpi-badge ${k.badge.cls}">${k.badge.text}</div>` : ''}
+    </div>`;
+  });
+
+  buildCharts(mean);
+  buildAreaCards(mean);
+  buildTable();
+}
+
+function scoreBadge(v) {
+  if (v >= 70) return {cls:'badge-green', text:'🟢 Bueno'};
+  if (v >= 45) return {cls:'badge-yellow', text:'🟡 Regular'};
+  return {cls:'badge-red', text:'🔴 Crítico'};
+}
+
+function calcNPS() {
+  if (!responses.length) return 0;
+  const promoters  = responses.filter(r=>r.nps>=9).length;
+  const detractors = responses.filter(r=>r.nps<=6).length;
+  return Math.round(((promoters - detractors) / responses.length)*100);
+}
+
+function buildCharts(mean) {
+  // Destroy existing
+  Object.values(chartInstances).forEach(c => c.destroy());
+  chartInstances = {};
+
+  const areas = ['Operaciones','Administrativo','Comercial','PMO'];
+  const areaVals = [mean('ops_avg'), mean('adm_avg'), mean('com_avg'), mean('pmo_avg')];
+  const areaColors = ['rgba(0,212,170,0.8)','rgba(155,110,247,0.8)','rgba(240,180,41,0.8)','rgba(0,194,122,0.8)'];
+
+  // 1) Areas bar
+  chartInstances.areas = new Chart(document.getElementById('chart-areas'), {
+    type: 'bar',
+    data: {
+      labels: ['Global','Obj. Servicio','Calidad/Precio','Renovación',...areas],
+      datasets: [{
+        label:'%',
+        data: [mean('global_sat'),mean('global_obj'),mean('global_valor'),mean('global_renew'),...areaVals],
+        backgroundColor: ['rgba(79,142,247,0.8)','rgba(79,142,247,0.6)','rgba(79,142,247,0.4)','rgba(79,142,247,0.3)',...areaColors],
+        borderRadius: 8, borderSkipped: false,
+      }]
+    },
+    options: chartOpts('bar', true)
+  });
+
+  // 2) Renewal doughnut
+  const high = responses.filter(r=>r.renew_prob>=70).length;
+  const mid  = responses.filter(r=>r.renew_prob>=45&&r.renew_prob<70).length;
+  const low  = responses.filter(r=>r.renew_prob<45).length;
+  chartInstances.renewal = new Chart(document.getElementById('chart-renewal'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Alta (≥70%)', 'Media (45-70%)', 'Baja (<45%)'],
+      datasets: [{
+        data: [high, mid, low],
+        backgroundColor: ['rgba(0,194,122,0.85)','rgba(240,180,41,0.85)','rgba(240,64,96,0.85)'],
+        borderWidth: 0, hoverOffset: 8
+      }]
+    },
+    options: { ...chartOpts('doughnut'), plugins: { legend: { position:'bottom', labels:{color:'#5a6a85',font:{size:11}} } } }
+  });
+
+  // 3) NPS
+  const promoters  = responses.filter(r=>r.nps>=9).length;
+  const passives   = responses.filter(r=>r.nps>=7&&r.nps<=8).length;
+  const detractors = responses.filter(r=>r.nps<=6).length;
+  chartInstances.nps = new Chart(document.getElementById('chart-nps'), {
+    type: 'bar',
+    data: {
+      labels: ['Promotores (9-10)','Pasivos (7-8)','Detractores (0-6)'],
+      datasets: [{
+        data: [promoters, passives, detractors],
+        backgroundColor: ['rgba(0,194,122,0.85)','rgba(240,180,41,0.85)','rgba(240,64,96,0.85)'],
+        borderRadius: 8, borderSkipped: false,
+      }]
+    },
+    options: chartOpts('bar', false)
+  });
+
+  // 4) Reasons
+  const reasonMap = {
+    presupuesto:'Presupuesto', valor:'ROI insuficiente',
+    funcionalidad:'Funcionalidad', soporte:'Soporte/Relación',
+    alternativa:'Alternativa', prioridades:'Prioridades internas', renovaria:'Renovaría'
+  };
+  const reasonCounts = {};
+  responses.forEach(r => {
+    const k = r.no_renew_reason || 'sin_respuesta';
+    reasonCounts[k] = (reasonCounts[k]||0)+1;
+  });
+  const rLabels = Object.keys(reasonCounts).map(k => reasonMap[k]||k);
+  const rVals   = Object.values(reasonCounts);
+  chartInstances.reasons = new Chart(document.getElementById('chart-reasons'), {
+    type: 'doughnut',
+    data: {
+      labels: rLabels,
+      datasets: [{
+        data: rVals,
+        backgroundColor: ['rgba(79,142,247,0.85)','rgba(240,64,96,0.85)','rgba(240,180,41,0.85)','rgba(155,110,247,0.85)','rgba(0,212,170,0.85)','rgba(240,112,64,0.85)','rgba(0,194,122,0.85)'],
+        borderWidth:0, hoverOffset:8
+      }]
+    },
+    options: { ...chartOpts('doughnut'), plugins:{ legend:{ position:'bottom', labels:{color:'#5a6a85',font:{size:10}} } } }
+  });
+
+  // 5) Ops detail radar-like bar
+  chartInstances.ops = new Chart(document.getElementById('chart-ops'), {
+    type:'bar',
+    data:{
+      labels:['Técnico','Respuesta','Calidad','Comunicación'],
+      datasets:[{
+        data:[mean('ops_tec'),mean('ops_resp'),mean('ops_cal'),mean('ops_com')],
+        backgroundColor:'rgba(0,212,170,0.7)',borderRadius:8,borderSkipped:false
+      }]
+    },
+    options: chartOpts('bar', false)
+  });
+
+  // 6) PMO detail
+  chartInstances.pmo = new Chart(document.getElementById('chart-pmo'), {
+    type:'bar',
+    data:{
+      labels:['Seguimiento','Reportes','Riesgos','Vínculo'],
+      datasets:[{
+        data:[mean('pmo_seg'),mean('pmo_rep'),mean('pmo_risk'),mean('pmo_pu')],
+        backgroundColor:'rgba(0,194,122,0.7)',borderRadius:8,borderSkipped:false
+      }]
+    },
+    options: chartOpts('bar', false)
+  });
+
+  // 7) Valor perception
+  chartInstances.valor = new Chart(document.getElementById('chart-valor'), {
+    type:'bar',
+    data:{
+      labels:['Calidad\nServicio','Relación\nPrecio','Prob.\nRenovar'],
+      datasets:[{
+        data:[mean('global_sat'),mean('global_valor'),mean('global_renew')],
+        backgroundColor:['rgba(79,142,247,0.8)','rgba(155,110,247,0.7)','rgba(0,212,170,0.7)'],
+        borderRadius:8,borderSkipped:false
+      }]
+    },
+    options: chartOpts('bar', false)
+  });
+}
+
+function chartOpts(type, showLegend=false) {
+  return {
+    responsive:true, maintainAspectRatio:false,
+    plugins:{
+      legend:{ display:showLegend, labels:{color:'#5a6a85',font:{size:11}} },
+      tooltip:{
+        backgroundColor:'rgba(13,18,32,0.95)',
+        borderColor:'rgba(30,45,69,0.8)',borderWidth:1,
+        titleColor:'#e8edf5',bodyColor:'#5a6a85',
+        callbacks:{
+          label: ctx => ` ${ctx.formattedValue}${type==='bar'?'%':''}`
+        }
+      }
+    },
+    scales: type==='bar' ? {
+      x:{ticks:{color:'#5a6a85',font:{size:11}},grid:{color:'rgba(30,45,69,0.4)'},border:{display:false}},
+      y:{ticks:{color:'#5a6a85',font:{size:11},callback:v=>v+'%'},grid:{color:'rgba(30,45,69,0.4)'},border:{display:false},min:0,max:100}
+    } : {}
+  };
+}
+
+function buildAreaCards(mean) {
+  const areas = [
+    {name:'Operaciones',emoji:'⚙️',color:'var(--teal)',
+     metrics:[
+       {label:'Conocimiento técnico', key:'ops_tec'},
+       {label:'Tiempo de respuesta',  key:'ops_resp'},
+       {label:'Calidad entregables',  key:'ops_cal'},
+       {label:'Comunicación',         key:'ops_com'},
+     ]
+    },
+    {name:'Administrativo',emoji:'🏛️',color:'var(--purple)',
+     metrics:[
+       {label:'Facturación',   key:'adm_fac'},
+       {label:'Documentación', key:'adm_doc'},
+       {label:'Resolución',    key:'adm_resp'},
+     ]
+    },
+    {name:'Comercial',emoji:'💼',color:'var(--gold)',
+     metrics:[
+       {label:'Propuestas',     key:'com_prop'},
+       {label:'Relación cuenta',key:'com_rel'},
+       {label:'Transparencia',  key:'com_trans'},
+     ]
+    },
+    {name:'PMO',emoji:'🗂️',color:'var(--green)',
+     metrics:[
+       {label:'Seguimiento',   key:'pmo_seg'},
+       {label:'Reportes',      key:'pmo_rep'},
+       {label:'Gestión riesgo',key:'pmo_risk'},
+       {label:'Vínculo cliente',key:'pmo_pu'},
+     ]
+    },
+  ];
+
+  const grid = document.getElementById('areas-grid');
+  grid.innerHTML = '';
+  areas.forEach(a => {
+    const ms = a.metrics.map(m => {
+      const v = mean(m.key);
+      return `<div class="area-metric">
+        <div class="area-metric-top">
+          <span class="area-metric-label">${m.label}</span>
+          <span class="area-metric-val" style="color:${a.color}">${v}%</span>
+        </div>
+        <div class="mini-bar"><div class="mini-bar-fill" style="--ac:${a.color};width:${v}%"></div></div>
+      </div>`;
+    }).join('');
+    const overall = mean(a.name==='Operaciones'?'ops_avg':a.name==='Administrativo'?'adm_avg':a.name==='Comercial'?'com_avg':'pmo_avg');
+    grid.innerHTML += `<div class="area-card" style="--ac:${a.color}">
+      <div class="area-head">
+        <span class="area-emoji">${a.emoji}</span>
+        <div>
+          <div class="area-name">${a.name}</div>
+          <div style="font-size:12px;color:${a.color};font-weight:600">Promedio: ${overall}%</div>
+        </div>
+      </div>
+      <div class="area-metrics">${ms}</div>
+    </div>`;
+  });
+}
+
+function buildTable() {
+  const tbody = document.getElementById('resp-tbody');
+  tbody.innerHTML = '';
+  [...responses].reverse().forEach(r => {
+    const rb = scoreBadge(r.renew_prob);
+    tbody.innerHTML += `<tr>
+      <td><strong>${r.empresa||'—'}</strong></td>
+      <td>${r.evaluador||'—'}</td>
+      <td style="color:var(--muted);font-size:12px">${r.proyecto||'—'}</td>
+      <td><span class="pill ${r.global_sat>=70?'pill-g':r.global_sat>=45?'pill-y':'pill-r'}">${r.global_sat}%</span></td>
+      <td>${r.ops_avg}%</td>
+      <td>${r.adm_avg}%</td>
+      <td>${r.com_avg}%</td>
+      <td>${r.pmo_avg}%</td>
+      <td><span class="pill ${r.nps>=9?'pill-g':r.nps>=7?'pill-y':'pill-r'}">${r.nps}/10</span></td>
+      <td><span class="pill ${rb.cls}">${r.renew_prob}%</span></td>
+      <td style="color:var(--muted);font-size:11px;white-space:nowrap">${r.fecha}</td>
+    </tr>`;
+  });
+}
+
+// ============================
+// EXPORT
+// ============================
+function exportCSV() {
+  if (!responses.length) { toast('⚠️ Sin datos para exportar','warn'); return; }
+  const headers = ['Fecha','Empresa','Evaluador','Cargo','Proyecto','Período','Global%','Obj%','Valor%','Renovación%','NPS','Prob.Renovar%','Ops%','Admin%','Comercial%','PMO%','Razón No Renovar','Fortaleza','Mejora'];
+  const rows = responses.map(r => [
+    r.fecha, r.empresa, r.evaluador, r.cargo, r.proyecto, r.periodo,
+    r.global_sat, r.global_obj, r.global_valor, r.global_renew,
+    r.nps, r.renew_prob, r.ops_avg, r.adm_avg, r.com_avg, r.pmo_avg,
+    r.no_renew_reason, r.fortaleza, r.mejora
+  ].map(v => `"${(v||'').toString().replace(/"/g,'""')}"`).join(','));
+  const csv = [headers.join(','), ...rows].join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'gmsectec_evaluaciones.csv';
+  a.click();
+  toast('✅ CSV exportado');
+}
+
+function exportSummary() {
+  if (!responses.length) { toast('⚠️ Sin datos','warn'); return; }
+  const n = responses.length;
+  const mean = key => avg(responses.map(r=>r[key]||0).filter(v=>v>0));
+  let t = `=== GMSectec · Reporte de Satisfacción Global ===\n`;
+  t += `Evaluaciones: ${n} | Fecha: ${new Date().toLocaleDateString('es-CO')}\n\n`;
+  t += `KPIs PRINCIPALES\n`;
+  t += `  • Satisfacción Global:   ${mean('global_sat')}%\n`;
+  t += `  • Cumplimiento Objetivos:${mean('global_obj')}%\n`;
+  t += `  • Relación Calidad/Precio:${mean('global_valor')}%\n`;
+  t += `  • Probabilidad Renovación:${mean('renew_prob')}%\n`;
+  t += `  • NPS Score:             ${calcNPS()}\n\n`;
+  t += `ÁREAS\n`;
+  t += `  • Operaciones:   ${mean('ops_avg')}%\n`;
+  t += `  • Administrativo:${mean('adm_avg')}%\n`;
+  t += `  • Comercial:     ${mean('com_avg')}%\n`;
+  t += `  • PMO:           ${mean('pmo_avg')}%\n`;
+  navigator.clipboard.writeText(t).then(() => toast('✅ Resumen copiado'));
+}
+
+// ============================
+// TOAST
+// ============================
+function toast(msg, type='ok') {
+  const el = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  el.querySelector('.t-dot').style.background = type==='warn'?'var(--yellow)':'var(--green)';
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// Init
+renderDashboard();
+</script>
+</body>
+</html>
